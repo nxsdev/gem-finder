@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id        String    @id @default(uuid()) @db.Uuid
+  planId    Int
+  name      String    @db.VarChar(256)
+  email     String    @unique @db.VarChar(256)
+  password  String    @db.VarChar(256)
+  status    String    @default("active") @db.VarChar(12)
+  createdAt DateTime  @default(now()) @db.Timestamptz
+  updatedAt DateTime  @updatedAt @db.Timestamptz
+  deletedAt DateTime? @db.Timestamptz
+  plan      Plan      @relation(fields: [planId], references: [id])
+}
+
+model User {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String    @db.VarChar(256)
+  email     String    @unique @db.VarChar(256)
+  password  String    @db.VarChar(256)
+  status    String    @default("active") @db.VarChar(12)
+  createdAt DateTime  @default(now()) @db.Timestamptz
+  updatedAt DateTime  @updatedAt @db.Timestamptz
+  deletedAt DateTime? @db.Timestamptz
+}
+
+model Plan {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(256)
+  price       Int
+  description String    @db.VarChar(256)
+  features    Json
+  status      String    @default("active") @db.VarChar(12)
+  companies   Company[]
+}
+
+model Exam {
+  id            Int            @id @default(autoincrement())
+  name          String         @db.VarChar(256)
+  examQuestions ExamQuestion[]
+}
+
+model Question {
+  id            Int            @id @default(autoincrement())
+  type          String
+  questionTexts QuestionText[]
+  examQuestions ExamQuestion[]
+}
+
+model ExamQuestion {
+  id         Int      @id @default(autoincrement())
+  examId     Int
+  questionId Int
+  exam       Exam     @relation(fields: [examId], references: [id])
+  question   Question @relation(fields: [questionId], references: [id])
+}
+
+model QuestionText {
+  id         Int      @id @default(autoincrement())
+  questionId Int
+  language   String   @db.VarChar(2)
+  text       Json
+  question   Question @relation(fields: [questionId], references: [id])
+}

@@ -1,3 +1,4 @@
 module.exports = {
-	extends: ['custom']
+  extends: ['custom', 'plugin:tailwindcss/recommended'],
+  plugins: ['tailwindcss']
 };
